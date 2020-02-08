@@ -1,8 +1,6 @@
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -28,7 +26,7 @@ public class IntegrationTests {
     @Autowired
     HashCodesRepository hashCodesRepository;
 
-    MessagesController messagesController;
+    private MessagesController messagesController;
     @Before
     public void init()
     {
@@ -55,7 +53,7 @@ public class IntegrationTests {
     @Test
     public void getMessageByHashCode_afterHashMessageRequest_ShouldReturnMessage() {
         //Assign
-        Map expectedValue = new HashMap<String, String>();
+        HashMap expectedValue = new HashMap<String, String>();
         expectedValue.put("message","hello World");
 
         //Act
