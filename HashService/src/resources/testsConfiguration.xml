@@ -4,5 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="hashMethod" class="src.App.HashMethodsImpl.SHA256Hash" ></bean>
+    <bean id="hashMethod" class="src.App.HashMethodsImpl.SHA256Hash"></bean>
+
 </beans>

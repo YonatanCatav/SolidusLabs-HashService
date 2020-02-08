@@ -1,7 +1,7 @@
-package App.Controllers;
-import App.Interfaces.IHash;
-import App.Models.HashCodeAndMessage;
-import App.Repositories.HashCodesRepository;
+package src.App.Controllers;
+import src.App.Interfaces.IHash;
+import src.App.Models.HashCodeAndMessage;
+import src.App.Repositories.HashCodesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -29,6 +29,11 @@ public class MessagesController {
         context = new ClassPathXmlApplicationContext("app.xml");
         hashMethod = (IHash) context.getBean("hashMethod");
     }
+//For integration tests
+    public MessagesController(ApplicationContext context, HashCodesRepository hashCodesRepository ) {
+        hashMethod = (IHash) context.getBean("hashMethod");
+        this.hashCodesRepository =hashCodesRepository;
+    }
 
     @PostMapping(value = "/messages")
     public Map<String, String> hashMessage(@RequestParam(value = "message", defaultValue = "") String message) {
@@ -45,7 +50,7 @@ public class MessagesController {
 
     @RequestMapping(value = "/messages/{hashCode}", method = GET)
     @ResponseBody
-    public Map getMessage(
+    public Map<String,String> getMessage(
             @PathVariable("hashCode") String hashCode) {
         Optional<HashCodeAndMessage> hashCodeAndMessage = hashCodesRepository.findById(hashCode);
 

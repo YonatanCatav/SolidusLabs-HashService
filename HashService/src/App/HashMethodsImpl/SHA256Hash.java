@@ -1,6 +1,6 @@
-package App.HashMethodsImpl;
+package src.App.HashMethodsImpl;
 
-import App.Interfaces.IHash;
+import src.App.Interfaces.IHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
