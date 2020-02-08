@@ -1,4 +1,6 @@
 package src.App.Controllers;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import src.App.Interfaces.IHash;
 import src.App.Models.HashCodeAndMessage;
 import src.App.Repositories.HashCodesRepository;
@@ -8,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -50,20 +53,21 @@ public class MessagesController {
 
     @RequestMapping(value = "/messages/{hashCode}", method = GET)
     @ResponseBody
-    public Map<String,String> getMessage(
+    public ResponseEntity<Map<String,String>> getMessage(
             @PathVariable("hashCode") String hashCode) {
         Optional<HashCodeAndMessage> hashCodeAndMessage = hashCodesRepository.findById(hashCode);
 
-        Map response;
-
+        ResponseEntity response;
         if (hashCodeAndMessage.isPresent()) {
-            response = new HashMap<String, String>() {{
+            Map responseMessage = new HashMap<String, String>();
+            responseMessage = new HashMap<String, String>() {{
                 put("message", hashCodeAndMessage.get().getMessage());
             }};
+            response = new ResponseEntity(responseMessage, HttpStatus.OK);
         } else {
-            response = new HashMap<String, String>() {{
-                put("err_msg", "Message not found");
-            }};
+            Map responseMessage = new HashMap<String, String>();
+            responseMessage.put("err_msg", "Message not found");
+            response = new ResponseEntity(responseMessage,HttpStatus.NOT_FOUND);
         }
 
         return response;
