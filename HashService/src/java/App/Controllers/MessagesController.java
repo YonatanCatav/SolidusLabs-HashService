@@ -1,38 +1,66 @@
 package App.Controllers;
-import App.HashMethod.IHash;
+import App.Interfaces.IHash;
+import App.Models.HashCodeAndMessage;
+import App.Repositories.HashCodesRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 
 @EnableAutoConfiguration
 @RestController
 public class MessagesController {
 
-    private  ApplicationContext context;
+    private ApplicationContext context;
     private IHash hashMethod;
-    public MessagesController()
-    {
+
+    @Autowired
+    HashCodesRepository hashCodesRepository ;
+
+    public MessagesController() {
         context = new ClassPathXmlApplicationContext("app.xml");
-        hashMethod = (IHash)context.getBean("hashMethod");
+        hashMethod = (IHash) context.getBean("hashMethod");
     }
+
     @PostMapping(value = "/messages")
-    public Map<String,String> getHash(@RequestParam(value = "message", defaultValue = "") String message) {
-        Map<String,String> result = new HashMap<>();
-        if(message=="")
-        {
-            result.put("error","No 'message' was received.\nPlease pass 'message' argument along the request");
-        }
-        else
-        {
+    public Map<String, String> hashMessage(@RequestParam(value = "message", defaultValue = "") String message) {
+        Map<String, String> response = new HashMap<>();
+        if (message == "") {
+            response.put("error", "No 'message' was received.\nPlease pass 'message' argument along the request");
+        } else {
             String hashedValue = hashMethod.Hash(message);
-            result.put("digest",hashedValue);
+            hashCodesRepository.save(new HashCodeAndMessage(hashedValue, message));
+            response.put("digest", hashedValue);
         }
-        return result;
+        return response;
+    }
+
+    @RequestMapping(value = "/messages/{hashCode}", method = GET)
+    @ResponseBody
+    public Map getMessage(
+            @PathVariable("hashCode") String hashCode) {
+        Optional<HashCodeAndMessage> hashCodeAndMessage = hashCodesRepository.findById(hashCode);
+
+        Map response;
+
+        if (hashCodeAndMessage.isPresent()) {
+            response = new HashMap<String, String>() {{
+                put("message", hashCodeAndMessage.get().getMessage());
+            }};
+        } else {
+            response = new HashMap<String, String>() {{
+                put("err_msg", "Message not found");
+            }};
+        }
+
+        return response;
     }
 }
